@@ -28,3 +28,19 @@ To auto-start Eglot with `fe lsp` in Fe buffers:
   :custom
   (fe-mode-eglot-auto t))
 ```
+
+To use `lsp-mode` instead:
+
+```elisp
+(use-package lsp-mode
+  :hook (fe-mode . lsp-deferred)
+  :config
+  (add-to-list 'lsp-language-id-configuration '(fe-mode . "fe"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("fe" "lsp"))
+    :activation-fn (lsp-activate-on "fe")
+    :server-id 'fe-lsp)))
+```
+
+Use either Eglot or `lsp-mode` per buffer, not both at once.
