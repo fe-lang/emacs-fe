@@ -1,4 +1,4 @@
-;;; fe-ts-mode.el --- Tree-sitter major mode for the Fe language -*- lexical-binding: t; -*-
+;;; fe-mode.el --- Tree-sitter major mode for the Fe language -*- lexical-binding: t; -*-
 
 ;; Author: Fe Contributors
 ;; Version: 0.1.0
@@ -18,7 +18,7 @@
 ;;   - `fe' CLI on PATH (for LSP and project root detection)
 ;;
 ;; Usage:
-;;   (require 'fe-ts-mode)
+;;   (require 'fe-mode)
 ;;
 ;; The mode automatically associates with *.fe files.  If eglot is
 ;; available, it registers `fe lsp' as the language server.
@@ -35,24 +35,24 @@
 
 ;;; Customization
 
-(defgroup fe-ts nil
-  "Settings for `fe-ts-mode'."
+(defgroup fe nil
+  "Settings for `fe-mode'."
   :group 'languages
-  :prefix "fe-ts-mode-")
+  :prefix "fe-mode-")
 
-(defcustom fe-ts-mode-indent-offset 4
+(defcustom fe-mode-indent-offset 4
   "Number of spaces for each indentation level in Fe."
   :type 'integer
   :safe #'integerp)
 
-(defcustom fe-ts-mode-eglot-auto nil
-  "When non-nil, automatically start eglot in `fe-ts-mode' buffers."
+(defcustom fe-mode-eglot-auto nil
+  "When non-nil, automatically start eglot in `fe-mode' buffers."
   :type 'boolean
   :safe #'booleanp)
 
 ;;; Syntax table
 
-(defvar fe-ts-mode--syntax-table
+(defvar fe-mode--syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?/ ". 124" table)
     (modify-syntax-entry ?* ". 23b" table)
@@ -61,25 +61,25 @@
     (modify-syntax-entry ?\" "\"" table)
     (modify-syntax-entry ?_ "_" table)
     table)
-  "Syntax table for `fe-ts-mode'.")
+  "Syntax table for `fe-mode'.")
 
 ;;; Font-lock
 
-(defvar fe-ts-mode--keywords
+(defvar fe-mode--keywords
   '("as" "const" "contract" "else" "enum" "extern" "fn" "for"
     "if" "impl" "in" "init" "ingot" "match" "mod" "msg" "mut"
     "recv" "self" "struct" "super" "trait" "type" "unsafe" "use"
     "uses" "where" "while" "with")
   "Fe language keywords for font-lock.")
 
-(defvar fe-ts-mode--operators
+(defvar fe-mode--operators
   '("!=" "%" "%=" "&" "&=" "&&" "*" "*=" "**" "**="
     "+" "+=" "-" "-=" "->" ".." "/=" ":" "<<"
     "<<=" "<=" "=" "==" "=>" ">" ">=" ">>" ">>="
     "^" "^=" "|" "|=" "||" "~")
   "Fe operator tokens.")
 
-(defun fe-ts-mode--font-lock-settings ()
+(defun fe-mode--font-lock-settings ()
   "Return tree-sitter font-lock settings for Fe."
   (treesit-font-lock-rules
    ;; Level 1: comments
@@ -92,7 +92,7 @@
    ;; Level 1: keywords
    :language 'fe
    :feature 'keyword
-   `([,@fe-ts-mode--keywords] @font-lock-keyword-face
+   `([,@fe-mode--keywords] @font-lock-keyword-face
      (break_statement) @font-lock-keyword-face
      (continue_statement) @font-lock-keyword-face
      (return_statement "return" @font-lock-keyword-face)
@@ -155,7 +155,7 @@
    ;; Level 4: operators
    :language 'fe
    :feature 'operator
-   `([,@fe-ts-mode--operators] @font-lock-operator-face
+   `([,@fe-mode--operators] @font-lock-operator-face
      (unary_expression "!" @font-lock-operator-face))
 
    ;; Level 4: punctuation
@@ -172,48 +172,48 @@
 
 ;;; Indentation
 
-(defvar fe-ts-mode--indent-rules
+(defvar fe-mode--indent-rules
   `((fe
      ((parent-is "source_file") column-0 0)
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ((node-is "}") parent-bol 0)
-     ((parent-is "block") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "function_body") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "struct_definition") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "enum_definition") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "contract_definition") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "msg_definition") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "trait_definition") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "impl_block") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "match_expression") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "match_arm") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "if_expression") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "record_expression") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "record_field_def_list") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "variant_def_list") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "parameter_list") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "argument_list") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "array_expression") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "tuple_expression") parent-bol fe-ts-mode-indent-offset)
-     ((parent-is "use_tree_list") parent-bol fe-ts-mode-indent-offset)
+     ((parent-is "block") parent-bol fe-mode-indent-offset)
+     ((parent-is "function_body") parent-bol fe-mode-indent-offset)
+     ((parent-is "struct_definition") parent-bol fe-mode-indent-offset)
+     ((parent-is "enum_definition") parent-bol fe-mode-indent-offset)
+     ((parent-is "contract_definition") parent-bol fe-mode-indent-offset)
+     ((parent-is "msg_definition") parent-bol fe-mode-indent-offset)
+     ((parent-is "trait_definition") parent-bol fe-mode-indent-offset)
+     ((parent-is "impl_block") parent-bol fe-mode-indent-offset)
+     ((parent-is "match_expression") parent-bol fe-mode-indent-offset)
+     ((parent-is "match_arm") parent-bol fe-mode-indent-offset)
+     ((parent-is "if_expression") parent-bol fe-mode-indent-offset)
+     ((parent-is "record_expression") parent-bol fe-mode-indent-offset)
+     ((parent-is "record_field_def_list") parent-bol fe-mode-indent-offset)
+     ((parent-is "variant_def_list") parent-bol fe-mode-indent-offset)
+     ((parent-is "parameter_list") parent-bol fe-mode-indent-offset)
+     ((parent-is "argument_list") parent-bol fe-mode-indent-offset)
+     ((parent-is "array_expression") parent-bol fe-mode-indent-offset)
+     ((parent-is "tuple_expression") parent-bol fe-mode-indent-offset)
+     ((parent-is "use_tree_list") parent-bol fe-mode-indent-offset)
      (no-node parent-bol 0)))
   "Tree-sitter indentation rules for Fe.")
 
 ;;; Imenu
 
-(defvar fe-ts-mode--imenu-settings
+(defvar fe-mode--imenu-settings
   '(("Function" "\\`function_definition\\'" nil nil)
     ("Struct" "\\`struct_definition\\'" nil nil)
     ("Enum" "\\`enum_definition\\'" nil nil)
     ("Contract" "\\`contract_definition\\'" nil nil)
     ("Trait" "\\`trait_definition\\'" nil nil)
     ("Impl" "\\`impl_block\\'" nil nil))
-  "Imenu categories for `fe-ts-mode'.")
+  "Imenu categories for `fe-mode'.")
 
 ;;; Project root detection via `fe root'
 
-(defun fe-ts-mode-project-find-function (dir)
+(defun fe-mode-project-find-function (dir)
   "Find the Fe project root for DIR by calling `fe root'.
 Returns a project instance or nil."
   (when-let* ((fe-file (or (buffer-file-name)
@@ -232,46 +232,46 @@ Returns a project instance or nil."
 
 ;;; Eglot integration
 
-(defun fe-ts-mode--setup-eglot ()
+(defun fe-mode--setup-eglot ()
   "Register Fe language server with eglot."
   (when (require 'eglot nil t)
     (add-to-list 'eglot-server-programs
-                 '(fe-ts-mode . ("fe" "lsp")))))
+                 '(fe-mode . ("fe" "lsp")))))
 
 ;;; Grammar installation
 
-(defvar fe-ts-mode--grammar-source
+(defvar fe-mode--grammar-source
   '("https://github.com/argotorg/fe" "master" "crates/tree-sitter-fe/src")
   "Source for the Fe tree-sitter grammar.
 Format: (URL REVISION SOURCE-DIR) — passed to `treesit-language-source-alist'.")
 
-(defun fe-ts-mode--ensure-grammar-source ()
+(defun fe-mode--ensure-grammar-source ()
   "Register the Fe grammar in `treesit-language-source-alist'."
   (unless (assq 'fe treesit-language-source-alist)
     (add-to-list 'treesit-language-source-alist
-                 (cons 'fe fe-ts-mode--grammar-source))))
+                 (cons 'fe fe-mode--grammar-source))))
 
-(defun fe-ts-mode--ensure-grammar ()
+(defun fe-mode--ensure-grammar ()
   "Ensure the Fe tree-sitter grammar is installed.
 If missing, offer to install it automatically."
-  (fe-ts-mode--ensure-grammar-source)
+  (fe-mode--ensure-grammar-source)
   (unless (treesit-language-available-p 'fe)
     (if (y-or-n-p "Fe tree-sitter grammar is not installed.  Install it now?")
         (progn
           (treesit-install-language-grammar 'fe)
           (unless (treesit-language-available-p 'fe)
             (user-error "Grammar installation failed")))
-      (user-error "Fe tree-sitter grammar is required for fe-ts-mode"))))
+      (user-error "Fe tree-sitter grammar is required for fe-mode"))))
 
 ;;;###autoload
-(define-derived-mode fe-ts-mode prog-mode "Fe"
+(define-derived-mode fe-mode prog-mode "Fe"
   "Major mode for editing Fe files, powered by tree-sitter.
 
-\\{fe-ts-mode-map}"
-  :syntax-table fe-ts-mode--syntax-table
-  :group 'fe-ts
+\\{fe-mode-map}"
+  :syntax-table fe-mode--syntax-table
+  :group 'fe
 
-  (fe-ts-mode--ensure-grammar)
+  (fe-mode--ensure-grammar)
 
   ;; Comment settings
   (setq-local comment-start "// ")
@@ -283,7 +283,7 @@ If missing, offer to install it automatically."
   (treesit-parser-create 'fe)
 
   ;; Font-lock
-  (setq-local treesit-font-lock-settings (fe-ts-mode--font-lock-settings))
+  (setq-local treesit-font-lock-settings (fe-mode--font-lock-settings))
   (setq-local treesit-font-lock-feature-list
               '((comment keyword)
                 (string type constant)
@@ -291,10 +291,10 @@ If missing, offer to install it automatically."
                 (variable operator punctuation attribute)))
 
   ;; Indentation
-  (setq-local treesit-simple-indent-rules fe-ts-mode--indent-rules)
+  (setq-local treesit-simple-indent-rules fe-mode--indent-rules)
 
   ;; Imenu
-  (setq-local treesit-simple-imenu-settings fe-ts-mode--imenu-settings)
+  (setq-local treesit-simple-imenu-settings fe-mode--imenu-settings)
 
   ;; Electric pairs
   (setq-local electric-pair-pairs
@@ -305,22 +305,22 @@ If missing, offer to install it automatically."
 ;;; Autoloads and hooks
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.fe\\'" . fe-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.fe\\'" . fe-mode))
 
 ;; Register project backend
-(add-hook 'fe-ts-mode-hook
+(add-hook 'fe-mode-hook
           (lambda ()
-            (add-hook 'project-find-functions #'fe-ts-mode-project-find-function nil t)))
+            (add-hook 'project-find-functions #'fe-mode-project-find-function nil t)))
 
 ;; Eglot setup (register server programs once, auto-start per config)
 (with-eval-after-load 'eglot
-  (fe-ts-mode--setup-eglot))
+  (fe-mode--setup-eglot))
 
-(add-hook 'fe-ts-mode-hook
+(add-hook 'fe-mode-hook
           (lambda ()
-            (when (and fe-ts-mode-eglot-auto
+            (when (and fe-mode-eglot-auto
                        (require 'eglot nil t))
               (eglot-ensure))))
 
-(provide 'fe-ts-mode)
-;;; fe-ts-mode.el ends here
+(provide 'fe-mode)
+;;; fe-mode.el ends here
