@@ -168,7 +168,7 @@
    ;; Level 4: attributes
    :language 'fe
    :feature 'attribute
-   '((attribute name: (identifier) @font-lock-preprocessor-face)))
+   '((attribute name: (identifier) @font-lock-preprocessor-face))))
 
 ;;; Indentation
 
