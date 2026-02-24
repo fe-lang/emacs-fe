@@ -14,7 +14,7 @@
 ;;
 ;; Requirements:
 ;;   - Emacs 29.1+ (built-in treesit support)
-;;   - tree-sitter-fe grammar installed
+;;   - C compiler (for building the tree-sitter grammar on first use)
 ;;   - `fe' CLI on PATH (for LSP and project root detection)
 ;;
 ;; Usage:
@@ -238,14 +238,30 @@ Returns a project instance or nil."
     (add-to-list 'eglot-server-programs
                  '(fe-ts-mode . ("fe" "lsp")))))
 
-;;; Major mode
+;;; Grammar installation
 
-(defun fe-ts-mode--check-grammar ()
-  "Check if the Fe tree-sitter grammar is available."
+(defvar fe-ts-mode--grammar-source
+  '("https://github.com/argotorg/fe" "master" "crates/tree-sitter-fe/src")
+  "Source for the Fe tree-sitter grammar.
+Format: (URL REVISION SOURCE-DIR) — passed to `treesit-language-source-alist'.")
+
+(defun fe-ts-mode--ensure-grammar-source ()
+  "Register the Fe grammar in `treesit-language-source-alist'."
+  (unless (assq 'fe treesit-language-source-alist)
+    (add-to-list 'treesit-language-source-alist
+                 (cons 'fe fe-ts-mode--grammar-source))))
+
+(defun fe-ts-mode--ensure-grammar ()
+  "Ensure the Fe tree-sitter grammar is installed.
+If missing, offer to install it automatically."
+  (fe-ts-mode--ensure-grammar-source)
   (unless (treesit-language-available-p 'fe)
-    (user-error "Tree-sitter grammar for Fe is not installed.
-Install it with `treesit-install-language-grammar' or
-M-x treesit-install-language-grammar RET fe RET")))
+    (if (y-or-n-p "Fe tree-sitter grammar is not installed.  Install it now?")
+        (progn
+          (treesit-install-language-grammar 'fe)
+          (unless (treesit-language-available-p 'fe)
+            (user-error "Grammar installation failed")))
+      (user-error "Fe tree-sitter grammar is required for fe-ts-mode"))))
 
 ;;;###autoload
 (define-derived-mode fe-ts-mode prog-mode "Fe"
@@ -255,7 +271,7 @@ M-x treesit-install-language-grammar RET fe RET")))
   :syntax-table fe-ts-mode--syntax-table
   :group 'fe-ts
 
-  (fe-ts-mode--check-grammar)
+  (fe-ts-mode--ensure-grammar)
 
   ;; Comment settings
   (setq-local comment-start "// ")
