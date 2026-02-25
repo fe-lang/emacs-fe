@@ -16,6 +16,8 @@
 ;;   - Emacs 29.1+ (built-in treesit support)
 ;;   - C compiler (for building the tree-sitter grammar on first use)
 ;;   - `fe' CLI on PATH (for LSP and project root detection)
+;;     Install via: curl -fsSL https://raw.githubusercontent.com/argotorg/fe/master/feup/feup.sh | bash
+;;     Or from source: cargo install --git https://github.com/argotorg/fe.git fe
 ;;
 ;; Usage:
 ;;   (require 'fe-mode)

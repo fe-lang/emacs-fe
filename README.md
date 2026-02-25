@@ -2,6 +2,24 @@
 
 Tree-sitter major mode for the [Fe language](https://fe-lang.org/) in Emacs.
 
+## Prerequisites
+
+1. **`fe` CLI** (includes the language server) must be installed and available in your PATH:
+
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/argotorg/fe/master/feup/feup.sh | bash
+   ```
+
+   Or build from source:
+
+   ```sh
+   cargo install --git https://github.com/argotorg/fe.git fe
+   ```
+
+2. **Emacs 29.1 or later** (for built-in tree-sitter support)
+
+3. **C compiler** (GCC or Clang, for building the tree-sitter grammar on first use)
+
 ## Install
 
 Add this to your `~/.emacs.d/init.el`:
