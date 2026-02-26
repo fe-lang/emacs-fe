@@ -37,7 +37,9 @@ Add this to your `~/.emacs.d/init.el`:
 
 ## LSP (optional)
 
-To auto-start Eglot with `fe lsp` in Fe buffers:
+The package auto-registers `fe lsp` with both Eglot and `lsp-mode` when either is loaded — no manual client registration needed.
+
+To auto-start **Eglot**:
 
 ```elisp
 (use-package fe
@@ -47,18 +49,23 @@ To auto-start Eglot with `fe lsp` in Fe buffers:
   (fe-mode-eglot-auto t))
 ```
 
-To use `lsp-mode` instead:
+To auto-start **lsp-mode**:
 
 ```elisp
-(use-package lsp-mode
-  :hook (fe-mode . lsp-deferred)
-  :config
-  (add-to-list 'lsp-language-id-configuration '(fe-mode . "fe"))
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection '("fe" "lsp"))
-    :activation-fn (lsp-activate-on "fe")
-    :server-id 'fe-lsp)))
+(use-package fe
+  :vc (:url "https://github.com/fe-lang/emacs-fe"
+       :branch "main")
+  :custom
+  (fe-mode-lsp-auto t))
 ```
 
 Use either Eglot or `lsp-mode` per buffer, not both at once.
+
+### Emacs distros (Doom, Spacemacs, etc.)
+
+```elisp
+(use-package! fe
+  :mode ("\\.fe\\'" . fe-mode)
+  :custom
+  (fe-mode-lsp-auto t))
+```

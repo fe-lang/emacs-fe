@@ -52,6 +52,12 @@
   :type 'boolean
   :safe #'booleanp)
 
+(defcustom fe-mode-lsp-auto nil
+  "When non-nil, automatically start lsp-mode in `fe-mode' buffers.
+Requires `lsp-mode' to be installed."
+  :type 'boolean
+  :safe #'booleanp)
+
 ;;; Syntax table
 
 (defvar fe-mode--syntax-table
@@ -240,6 +246,17 @@ Returns a project instance or nil."
     (add-to-list 'eglot-server-programs
                  '(fe-mode . ("fe" "lsp")))))
 
+;;; lsp-mode integration
+
+(defun fe-mode--setup-lsp ()
+  "Register Fe language server with lsp-mode."
+  (add-to-list 'lsp-language-id-configuration '(fe-mode . "fe"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("fe" "lsp"))
+    :activation-fn (lsp-activate-on "fe")
+    :server-id 'fe-lsp)))
+
 ;;; Grammar installation
 
 (defvar fe-mode--grammar-source
@@ -323,6 +340,16 @@ If missing, offer to install it automatically."
             (when (and fe-mode-eglot-auto
                        (require 'eglot nil t))
               (eglot-ensure))))
+
+;; lsp-mode setup (register client once, auto-start per config)
+(with-eval-after-load 'lsp-mode
+  (fe-mode--setup-lsp))
+
+(add-hook 'fe-mode-hook
+          (lambda ()
+            (when (and fe-mode-lsp-auto
+                       (require 'lsp-mode nil t))
+              (lsp-deferred))))
 
 (provide 'fe-mode)
 ;;; fe-mode.el ends here
