@@ -260,9 +260,11 @@ Returns a project instance or nil."
 ;;; Grammar installation
 
 (defvar fe-mode--grammar-source
-  '("https://github.com/argotorg/fe" "master" "crates/tree-sitter-fe/src")
+  '("https://github.com/fe-lang/tree-sitter-fe" "v26.2.0" "src")
   "Source for the Fe tree-sitter grammar.
-Format: (URL REVISION SOURCE-DIR) — passed to `treesit-language-source-alist'.")
+Format: (URL REVISION SOURCE-DIR) — passed to `treesit-language-source-alist'.
+tree-sitter-fe is a generated mirror of the grammar in argotorg/fe; pin a
+release tag here.")
 
 (defun fe-mode--ensure-grammar-source ()
   "Register the Fe grammar in `treesit-language-source-alist'."
